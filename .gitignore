@@ -1,0 +1,89 @@
+# ============================================
+# Git
+# ============================================
+.git/
+.gitattributes
+.gitmodules
+
+# ============================================
+# Imágenes de disco / máquinas virtuales (CHR)
+# Muy pesados para el repositorio
+# ============================================
+*.img
+*.img.zip
+*.iso
+*.qcow2
+*.qcow
+*.vmdk
+*.vdi
+*.ova
+*.ovf
+*.vmx
+*.vhdx
+*.raw
+
+# ============================================
+# Comprimidos y paquetes pesados
+# ============================================
+*.rar
+*.zip
+*.7z
+*.tar.gz
+*.tgz
+*.tar.bz2
+*.tar.xz
+*.deb
+*.rpm
+*.exe
+*.msi
+*.dmg
+
+# ============================================
+# Documentos binarios grandes (opcional)
+# Descomenta si no quieres versionarlos
+# ============================================
+*.ppsx
+*.pptx
+*.pdf
+*.odp
+*.docx
+*.xlsx
+
+# ============================================
+# Sistema operativo / editores
+# ============================================
+.DS_Store
+Thumbs.db
+desktop.ini
+*~
+*.swp
+*.swo
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# ============================================
+# Logs y temporales
+# ============================================
+*.log
+logs/
+tmp/
+temp/
+*.pid
+*.seed
+*.swp
+.cache/
+
+# ============================================
+# Sistema /Entorno
+# ============================================
+.env
+.env.*
+!.env.example
+*.local
+node_modules/
+__pycache__/
+*.py[cod]
+.venv/
+venv/

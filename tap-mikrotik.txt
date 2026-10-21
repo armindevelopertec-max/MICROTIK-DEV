@@ -1,0 +1,14 @@
+qemu-system-x86_64: -netdev tap,id=lan0,ifname=tap-mikrotik,script=no,downscript=no: could not configure /dev/net/tun (tap-mikrotik): Operation not permitted
+armintec@fedora:~/Documentos/MICRO-TIK$ ls -l /dev/net/tun
+crw-rw-rw-. root root 0 B Tue Oct 20 10:07:32 2026  /dev/net/tun
+armintec@fedora:~/Documentos/MICRO-TIK$ ls -l /dev/kvm
+crw-rw-rw-. root kvm 0 B Tue Oct 20 10:40:20 2026  /dev/kvm
+armintec@fedora:~/Documentos/MICRO-TIK$ ip link show tap-mikrotik
+Device "tap-mikrotik" does not exist.
+armintec@fedora:~/Documentos/MICRO-TIK$ sudo ip tuntap add dev tap-mikrotik mode tap user armintec
+[sudo] contraseña para armintec:
+armintec@fedora:~/Documentos/MICRO-TIK$ sudo ip link  set tap-mikrotik up
+armintec@fedora:~/Documentos/MICRO-TIK$ ip link show tap-mikrotik
+5: tap-mikrotik: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc fq_codel state DOWN mode DEFAULT group default qlen 1000
+    link/ether 36:16:80:66:5b:43 brd ff:ff:ff:ff:ff:ff
+

@@ -1,0 +1,165 @@
+# Detener todos los contenedores en ejecución
+docker stop $(docker ps -a -q) 2>/dev/null
+
+# Eliminar todos los contenedores
+docker rm $(docker ps -a -q) 2>/dev/null
+
+# Limpiar imágenes, volúmenes y redes sin usar
+docker system prune -a --volumes -f
+--------------------------------------------------------------------------------------------------------------------
+comprobar 
+--------------------------------------------------------------------------------------------------------------------
+docker ps -a
+docker images
+-------------------------------------------------------------------------------------------------------------------
+creación de la carpeta-
+Crea un directorio dedicado para alojar la configuración de Mikhmon:
+mkdir -p ~/mikhmon-docker && cd ~/mikhmon-docker
+
+--------------------------------------------------------------------
+creación de Dockerfile
+
+----------------------------------------------------------------------
+FROM alpine:3.18
+
+# Instalar dependencias necesarias incluyendo php81-sockets
+RUN apk add --no-cache \
+    nginx \
+    php81 \
+    php81-fpm \
+    php81-curl \
+    php81-session \
+    php81-json \
+    php81-openssl \
+    php81-sockets \
+    supervisor \
+    curl \
+    unzip
+
+WORKDIR /var/www/html
+
+# Descargar Mikhmon v3 desde el repositorio oficial de laksa19
+RUN curl -sSL "https://github.com/laksa19/mikhmonv3/archive/refs/heads/master.zip" -o mikhmon.zip \
+    && unzip -q mikhmon.zip \
+    && cp -r mikhmonv3-master/* . \
+    && rm -rf mikhmonv3-master mikhmon.zip \
+    && chown -R nginx:nginx /var/www/html
+
+RUN mkdir -p /run/nginx
+
+COPY nginx.conf /etc/nginx/http.d/default.conf
+COPY supervisord.conf /etc/supervisord.conf
+
+EXPOSE 80
+
+CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+--------------------------------------------------------------------------------------------------------------
+Crear nginx.conf
+--------------------------------------------------------------------------------------------------------------
+server {
+    listen 80 default_server;
+    listen [::]:80 default_server;
+    root /var/www/html;
+    index index.php index.html;
+
+    server_name _;
+
+    location / {
+        try_files $uri $uri/ /index.php?$args;
+    }
+
+    location ~ \.php$ {
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+
+
+-----------------------------------------------------------------------------------------------------------------
+Crear supervisord.conf
+------------------------------------------------------------------------------------------------------------------
+[supervisord]
+nodaemon=true
+user=root
+logfile=/var/log/supervisord.log
+pidfile=/var/run/supervisord.pid
+
+[program:php-fpm]
+command=php-fpm81 -F
+autostart=true
+autorestart=true
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+
+[program:nginx]
+command=nginx -g "daemon off;"
+autostart=true
+autorestart=true
+stdout_logfile=/dev/stdout
+stdout_logfile_maxbytes=0
+stderr_logfile=/dev/stderr
+stderr_logfile_maxbytes=0
+----------------------------------------------------------------------------------------------------------------------
+Crea el archivo docker-compose.yml:
+-----------------------------------------------------------------------------------------------------------------
+version: '3.8'
+
+services:
+  mikhmon:
+    build: .
+    container_name: mikhmon
+    restart: always
+    ports:
+      - "80:80"
+---------------------------------------------------------------
+Confirma que el módulo sockets esté correctamente cargado:
+--------------------------------------------------------------------------
+docker exec -it mikhmon php -m | grep sockets
+-------------------------------------------------------------------
+Aplicar permisos de escritura totales en /var/www/html:1 min.Ejecuta dentro del contenedor el cambio de propietario y permisos para el directorio 
+web:
+
+docker exec -it mikhmon chown -R nginx:nginx /var/www/html
+docker exec -it mikhmon chmod -R 777 /var/www/html/config
+(Si la carpeta config no existe, creémosla e impartamos permisos):
+
+docker exec -it mikhmon mkdir -p /var/www/html/config
+docker exec -it mikhmon chown -R nginx:nginx /var/www/html/config
+docker exec -it mikhmon chmod -R 777 /var/www/html/config
+
+
+----------------------------------------------------------------------------------------------
+comprobación Final
+---------------------------------------------------------------------------------------
+docker exec -it mikhmon php -r '
+include "/var/www/html/include/routeros_api.class.php";
+$API = new RouterosAPI();
+$API->debug = true;
+if ($API->connect("192.168.1.6", "mikhmon_user", "123456789")) {
+    echo "\n>>> CONEXION EXITOSA A MIKROTIK <<<\n";
+    $API->disconnect();
+} else {
+    echo "\n>>> ERROR AL CONECTAR <<<\n";
+}
+'
+---------------------------------------------------------------------------------------------------------------
+extensiones de sesión y cifrado estén completamente instaladas en la imagen:
+----------------------------------------------------------------------------------
+docker exec -it mikhmon apk add --no-cache php81-session php81-openssl php81-curl
+----------------------------------------------------------------------------------------
+PERMISOS
+-----------------------------------------------------------------------------------
+docker exec -it mikhmon chmod -R 777 /var/www/html
+docker exec -it mikhmon chown -R nginx:nginx /var/www/html
+---------------------------------------------------------------------------
+BORRAR ARCHIVOS TEMPORALES
+----------------------------------------------------------------------------
+docker exec -it mikhmon sh -c "rm -rf /var/lib/php81/sessions/* /tmp/*"
