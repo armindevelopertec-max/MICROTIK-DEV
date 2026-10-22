@@ -2,6 +2,17 @@
 
 **Documento completo de instalación, configuración y operación**
 
+> 📌 **Este es el documento original narrativo del proyecto.** La documentación está separada
+> y ordenada en [`docs/`](./docs/README.md):
+>
+> | Documento | Contenido |
+> |---|---|
+> | [`00-ENTORNO-Y-PREPARACION.md`](./docs/00-ENTORNO-Y-PREPARACION.md) | Qué es el laboratorio y cómo preparar el entorno |
+> | [`01-COMANDOS-MIKROTIK.md`](./docs/01-COMANDOS-MIKROTIK.md) | Catálogo completo de comandos RouterOS |
+> | [`02-COMANDOS-ESENCIALES-MIKROTIK.md`](./docs/02-COMANDOS-ESENCIALES-MIKROTIK.md) | El kit mínimo imprescindible de RouterOS |
+> | [`03-EQUIVALENTES-VMWARE-VIRTUALBOX.md`](./docs/03-EQUIVALENTES-VMWARE-VIRTUALBOX.md) | El CHR en VMware y VirtualBox |
+> | [`04-MIKROTIK-FISICO.md`](./docs/04-MIKROTIK-FISICO.md) | El caso real con un RouterBOARD |
+
 | Dato | Valor |
 |---|---|
 | Fecha | 2026-10-21 |
