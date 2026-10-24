@@ -132,6 +132,11 @@ log "Asegurando Internet por $UPLINK_IF"
 if ! ip route | grep -q '^default'; then
   sudo nmcli device connect "$UPLINK_IF" 2>/dev/null || true
 fi
+# NetworkManager puede tardar unos segundos en instalar la ruta tras conectar
+for _ in $(seq 1 15); do
+  ip route | grep -q '^default' && break
+  sleep 1
+done
 ip route | grep -q '^default' || die "No hay ruta por defecto tras intentar conectar $UPLINK_IF"
 
 # ------------------------------------------------------------

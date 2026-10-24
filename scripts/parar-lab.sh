@@ -25,17 +25,21 @@ sudo -v
 log "Cerrando QEMU"
 pkill -f qemu-system-x86_64 2>/dev/null && log "QEMU detenido" || warn "QEMU no estaba corriendo"
 
-log "Deteniendo hostapd"
-sudo pkill -x hostapd 2>/dev/null && log "hostapd detenido" || warn "hostapd no estaba corriendo"
+log "Deteniendo panel web"
+pkill -f "web/app.py" 2>/dev/null && log "Panel web detenido" || warn "Panel web no estaba corriendo"
 
-# Descubrir que interfaz era el AP si no se indique
+# Descubrir que interfaz era el AP ANTES de matar hostapd
 if [[ -z "$AP_IF" ]]; then
   AP_IF="$(sudo hostapd_cli status 2>/dev/null | awk -F= '/^interface=/{print $2}')" || true
 fi
 
+log "Deteniendo hostapd"
+sudo pkill -x hostapd 2>/dev/null && log "hostapd detenido" || warn "hostapd no estaba corriendo"
+
 if [[ -n "$AP_IF" ]]; then
   log "Devolviendo $AP_IF a NetworkManager"
   sudo nmcli device set "$AP_IF" managed yes 2>/dev/null || true
+  sudo nmcli device connect "$AP_IF" 2>/dev/null || true
 fi
 
 if [[ -n "$UPLINK_IF" ]]; then

@@ -40,6 +40,7 @@
 | **04** | [`04-MIKROTIK-FISICO.md`](./04-MIKROTIK-FISICO.md) | CHR vs hardware, elección de equipo, primer arranque, actualización de RouterOS, bridge y offload por hardware, **`/interface wifi` vs `/interface wireless`**, hotspot sobre la radio real, CAPsMAN, WAN (PPPoE / DHCP / Starlink), licencias, migración de la config del CHR al hardware, hardening, netinstall y reset. | Si vas a montar esto en un RouterBOARD real. |
 | **05** | [`05-INFORME-VERIFICACION-HOTSPOT.md`](./05-INFORME-VERIFICACION-HOTSPOT.md) | Informe de la verificación punta a punta del hotspot: hostapd, bridge, DHCP, portal, login HTTP-CHAP, NAT. | Para ver qué se probó y cómo. |
 | **06** | [`06-TICKETS-QR.md`](./06-TICKETS-QR.md) | **Tickets QR**: script Python que usa la API de RouterOS, crea usuarios hotspot, genera QR WiFi + QR de login HTTP-PAP, tarjetas PNG, CSV/HTML y comandos de administración. | Cuando quieras repartir accesos sin escribir credenciales. |
+| **07** | [`07-ARRANQUE-AUTOMATICO-Y-WEB.md`](./07-ARRANQUE-AUTOMATICO-Y-WEB.md) | **Arranque automático y panel web**: un solo comando para levantar red + AP + CHR + API + Flask, autostart al iniciar sesión, configuración del panel, exposición a la LAN y solución de problemas. | Para el día a día y para no olvidar el orden de arranque. |
 
 ---
 
@@ -55,14 +56,18 @@
 
 | Script | Para qué |
 |---|---|
-| [`../scripts/iniciar-lab.sh`](../scripts/iniciar-lab.sh) | Levanta todo el laboratorio: bridge `br-mikrotik`, tap `tap-mikrotik`, `hostapd` y el CHR en QEMU con el reenvío de puertos (SSH 2222, WinBox 8291, API 8728). |
-| [`../scripts/parar-lab.sh`](../scripts/parar-lab.sh) | Lo para todo y deja el host limpio. |
+| [`../scripts/arrancar-todo.sh`](../scripts/arrancar-todo.sh) | **Recomendado.** Levanta todo de una vez: red + AP (`sudo`), CHR en QEMU con SSH 2222 / WinBox 8291 / API 8728 y el panel web Flask. Idempotente. |
+| [`../scripts/preparar-red.sh`](../scripts/preparar-red.sh) | Parte privilegiada: uplink, bridge `br-mikrotik`, tap `tap-mikrotik` y `hostapd`. |
+| [`../scripts/instalar-autostart.sh`](../scripts/instalar-autostart.sh) | Instala o quita (`--quitar`) el arranque automático al iniciar sesión. |
+| [`../scripts/iniciar-lab.sh`](../scripts/iniciar-lab.sh) | Variante antigua que arranca QEMU como root; se mantiene por compatibilidad. |
+| [`../scripts/parar-lab.sh`](../scripts/parar-lab.sh) | Para QEMU, hostapd y el panel web, y devuelve la radio a NetworkManager. |
+| [`../scripts/admin-web`](../scripts/admin-web) | Lanzador del panel web Flask (`web/app.py`). |
 | [`../scripts/ticket-qr`](../scripts/ticket-qr) | Lanzador del generador de tickets QR. |
 | [`../scripts/ticket_qr.py`](../scripts/ticket_qr.py) | Script Python: API RouterOS, usuarios hotspot, QR WiFi/login, tarjetas PNG, CSV/HTML. |
 
 ```bash
 # Uso
-./scripts/iniciar-lab.sh     # arrancar
+./scripts/arrancar-todo.sh   # arrancar TODO (red + AP + CHR + web)
 ./scripts/parar-lab.sh       # parar
 ```
 
@@ -81,6 +86,7 @@
 | **Pool DHCP** | 192.168.77.100–192.168.77.199 |
 | **Portal** | `http://192.168.77.254/login` |
 | **Acceso al CHR** | `ssh -p 2222 admin@127.0.0.1` · WinBox `127.0.0.1:8291` · API `127.0.0.1:8728` |
+| **Panel web** | `http://127.0.0.1:5000` (usuario `admin`; ver doc 07) |
 
 ---
 
