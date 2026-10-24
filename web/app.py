@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import dataclasses
 import hmac
 import io
 import json
