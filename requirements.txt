@@ -1,0 +1,5 @@
+# Dependencias de scripts/ticket_qr.py y del panel web (web/app.py)
+routeros-api>=0.21.0
+segno>=1.6.0
+Pillow>=10.0.0
+Flask>=3.0.0

@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Panel de tickets · MIKROTIK-LAB</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="login-body">
+  <main class="login-card">
+    <div class="brand">
+      <span class="brand-dot"></span>
+      <span>MIKROTIK-LAB</span>
+    </div>
+    <h1>Panel de tickets</h1>
+    <p class="muted">Administración de tickets QR · Hotspot</p>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <form method="post" class="login-form">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label class="field">
+        <span>Usuario</span>
+        <input name="usuario" value="admin" autocomplete="username" required autofocus>
+      </label>
+      <label class="field">
+        <span>Contraseña</span>
+        <input type="password" name="password" autocomplete="current-password" required>
+      </label>
+      <button class="primary full" type="submit">Entrar</button>
+    </form>
+    <p class="small muted">Servicio local del laboratorio. Configura con <code>WEB_ADMIN_PASSWORD</code> en <code>.env</code>.</p>
+  </main>
+</body>
+</html>

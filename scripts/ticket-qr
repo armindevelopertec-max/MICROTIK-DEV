@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Lanzador de scripts/ticket_qr.py
+#
+# Usa el Python del .venv del proyecto si existe; si no, el python3 del sistema.
+#   ./scripts/ticket-qr --help
+#   ./scripts/ticket-qr crear -n 10 -t 1h
+set -euo pipefail
+
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PY="${BASE_DIR}/.venv/bin/python"
+if [[ ! -x "$PY" ]]; then
+  PY="${PYTHON:-python3}"
+fi
+
+exec "$PY" "${BASE_DIR}/scripts/ticket_qr.py" "$@"

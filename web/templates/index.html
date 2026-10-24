@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>Panel de tickets · MIKROTIK-LAB</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="brand">
+        <span class="brand-dot"></span>
+        <span>MIKROTIK-LAB</span>
+        <span class="muted">/ panel de tickets</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <span id="api-status" class="pill pill-warn">Conectando…</span>
+      <span class="muted" id="server-clock"></span>
+      <form method="post" action="{{ url_for('logout') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="ghost">Salir</button>
+      </form>
+    </div>
+  </header>
+
+  <div id="error-banner" class="banner hidden"></div>
+
+  <section class="stats">
+    <div class="stat">
+      <span>Tickets QR</span>
+      <strong id="stat-tickets">—</strong>
+    </div>
+    <div class="stat">
+      <span>Sesiones activas</span>
+      <strong id="stat-activos">—</strong>
+    </div>
+    <div class="stat">
+      <span>Disponibles</span>
+      <strong id="stat-disponibles">—</strong>
+    </div>
+    <div class="stat">
+      <span>Agotados</span>
+      <strong id="stat-agotados">—</strong>
+    </div>
+    <div class="stat">
+      <span>SSID</span>
+      <strong id="stat-ssid">{{ config_ui.ssid }}</strong>
+      <small id="stat-portal">{{ config_ui.portal }}</small>
+    </div>
+  </section>
+
+  <main class="layout">
+    <section class="panel create-panel">
+      <h2>Crear tickets</h2>
+      <form id="form-crear">
+        <div class="grid-2">
+          <label class="field">
+            <span>Cantidad</span>
+            <input id="crear-cantidad" type="number" min="1" max="200" value="1" required>
+          </label>
+          <label class="field">
+            <span>Duración</span>
+            <input id="crear-tiempo" value="1h" list="duraciones" required>
+            <datalist id="duraciones">
+              <option value="15m">
+              <option value="30m">
+              <option value="1h">
+              <option value="2h">
+              <option value="1h30m">
+              <option value="4h">
+              <option value="1d">
+            </datalist>
+          </label>
+        </div>
+        <div class="presets" data-target="crear-tiempo">
+          <button type="button" class="chip">15m</button>
+          <button type="button" class="chip">30m</button>
+          <button type="button" class="chip">1h</button>
+          <button type="button" class="chip">2h</button>
+          <button type="button" class="chip">1d</button>
+        </div>
+        <label class="field">
+          <span>Lote (opcional)</span>
+          <input id="crear-lote" placeholder="evento-octubre">
+        </label>
+        <label class="field">
+          <span>Nota (opcional)</span>
+          <input id="crear-nota" placeholder="Texto libre para el comentario">
+        </label>
+        <div class="grid-2">
+          <label class="field">
+            <span>Límite de datos</span>
+            <input id="crear-bytes" placeholder="500M, 1G (opcional)">
+          </label>
+          <label class="field">
+            <span>Rate limit</span>
+            <input id="crear-rate" placeholder="5M/5M (opcional)">
+          </label>
+        </div>
+        <label class="field" style="flex-direction:row;align-items:center;gap:0.6rem">
+          <input id="usar-mismo-login" type="checkbox">
+          <span>Usar el MISMO login para varios dispositivos</span>
+        </label>
+        <label class="field" id="wrap-dispositivos" style="display:none">
+          <span>Dispositivos simultáneos (shared-users)</span>
+          <input id="dispositivos-simultaneos" type="number" min="2" max="50" value="5">
+        </label>
+        <button class="primary" type="submit">Generar tickets</button>
+      </form>
+      <p class="small muted">Los QR se generan en <code>tickets/&lt;lote&gt;</code>. Escanea primero el QR WiFi y luego el QR de acceso.</p>
+    </section>
+
+    <section class="panel">
+      <div class="panel-title">
+        <h2>Sesiones activas</h2>
+        <span id="activos-badge" class="badge">0</span>
+      </div>
+      <div class="table-wrap">
+        <table id="tabla-activos">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>IP / MAC</th>
+              <th>Tiempo</th>
+              <th>Tráfico</th>
+              <th>Login</th>
+              <th>Ticket</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <section class="panel full">
+    <div class="panel-title">
+      <div class="tabs">
+        <button class="tab active" data-tab="tickets">Tickets</button>
+        <button class="tab" data-tab="usuarios">Todos los usuarios</button>
+        <button class="tab" data-tab="lotes">Lotes</button>
+      </div>
+      <input id="buscador" class="search" placeholder="Buscar código, lote, nota, IP…">
+    </div>
+    <div id="tab-tickets" class="tab-panel">
+      <div class="table-wrap">
+        <table id="tabla-tickets">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Estado</th>
+              <th>Perfil</th>
+              <th>Límite / Usado / Restante</th>
+              <th>Sesión</th>
+              <th>Lote / Creado</th>
+              <th>Nota</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="tab-usuarios" class="tab-panel hidden">
+      <div class="table-wrap">
+        <table id="tabla-usuarios">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Perfil</th>
+              <th>Estado</th>
+              <th>Límite</th>
+              <th>Usado</th>
+              <th>Sesión</th>
+              <th>QR</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+    <div id="tab-lotes" class="tab-panel hidden">
+      <div class="lotes-header">
+        <button id="btn-refrescar-lotes" class="ghost">Actualizar lotes</button>
+      </div>
+      <div class="table-wrap">
+        <table id="tabla-lotes">
+          <thead>
+            <tr>
+              <th>Lote</th>
+              <th>Tickets</th>
+              <th>Creado</th>
+              <th>Descargas</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card">
+      <button class="modal-close" data-close>×</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+
+  <script>
+    window.ESTADO_INICIAL = {{ estado|tojson }};
+    window.CONFIG_UI = {{ config_ui|tojson }};
+  </script>
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>

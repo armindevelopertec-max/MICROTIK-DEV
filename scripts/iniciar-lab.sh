@@ -6,7 +6,7 @@
 #   1. Asegura Internet por un adaptador (uplink)
 #   2. Prepara el bridge br-mikrotik y el tap tap-mikrotik
 #   3. Libera el adaptador WiFi para modo AP y arranca hostapd
-#   4. Arranca QEMU con el CHR
+#   4. Arranca QEMU con el CHR (SSH 2222, API 8728 y WinBox 8291 en localhost)
 #
 # Uso:
 #   ./iniciar-lab.sh
@@ -116,6 +116,8 @@ sudo nmcli connection modify "$BR" \
   bridge.stp no
 sudo nmcli connection up "$BR" 2>/dev/null || true
 sudo ip link set "$BR" up
+# Refuerzo en el kernel: NetworkManager no siempre aplica stp=no al reactivar
+sudo ip link set "$BR" type bridge stp_state 0 forward_delay 0
 
 # ------------------------------------------------------------
 log "Preparando tap $TAP"
@@ -167,7 +169,7 @@ else
     -m "$MEM" \
     -drive file="$DISK",format=qcow2 \
     -boot c \
-    -nic user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:2222-:22,hostfwd=tcp:127.0.0.1:8291-:8291 \
+    -nic user,model=virtio-net-pci,hostfwd=tcp:127.0.0.1:2222-:22,hostfwd=tcp:127.0.0.1:8291-:8291,hostfwd=tcp:127.0.0.1:8728-:8728 \
     -netdev tap,id=lan0,ifname="$TAP",script=no,downscript=no \
     -device virtio-net-pci,netdev=lan0 \
     -display gtk &
@@ -183,6 +185,7 @@ $(log "Laboratorio arrancado")
   Bridge         : $BR (192.168.77.1/24)
   Tap            : $TAP
   CHR SSH        : ssh -p 2222 admin@127.0.0.1
+  CHR API        : 127.0.0.1:8728
   CHR WinBox     : 127.0.0.1:8291
   Portal         : http://192.168.77.254/login
 

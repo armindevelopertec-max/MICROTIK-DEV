@@ -1,0 +1,9 @@
+qemu-img create \
+  -f qcow2 \
+  -F raw \
+  -b chr-lab.img \
+  chr-disk-vm3.qcow2 \
+  2G
+
+
+Formatting 'chr-disk-vm3.qcow2', fmt=qcow2 cluster_size=65536 extended_l2=off compression_type=zlib size=2147483648 backing_file=chr-lab.img backing_fmt=raw lazy_refcounts=off refcount_bits=16

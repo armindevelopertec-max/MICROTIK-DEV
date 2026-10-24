@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="expires" content="-1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MIKROTIK-LAB | Acceso por Ticket</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+    $(if chap-id)
+    <form name="sendin" action="$(link-login-only)" method="post" style="display:none">
+        <input type="hidden" name="username" />
+        <input type="hidden" name="password" />
+        <input type="hidden" name="dst" value="$(link-orig)" />
+        <input type="hidden" name="popup" value="true" />
+    </form>
+
+    <script src="/md5.js"></script>
+    <script>
+        function doLogin() {
+            document.sendin.username.value = document.login.username.value;
+            document.sendin.password.value = hexMD5('$(chap-id)' + document.login.password.value + '$(chap-challenge)');
+            document.sendin.submit();
+            return false;
+        }
+    </script>
+    $(endif)
+
+    <div class="page">
+        <div class="card">
+            <div class="card-header">
+                <div class="dot"></div>
+                <div class="title">
+                    <span class="lab">MIKROTIK-LAB</span>
+                    <span class="subtitle">ACCESO POR TICKET QR</span>
+                </div>
+            </div>
+
+            <form name="login" action="$(link-login-only)" method="post" $(if chap-id) onSubmit="return doLogin()" $(endif)>
+                <input type="hidden" name="dst" value="$(link-orig)" />
+                <input type="hidden" name="popup" value="true" />
+
+                $(if error)
+                <div class="alert alert-error">
+                    $(error)
+                </div>
+                $(endif)
+
+                <div class="field">
+                    <label for="username">Código del ticket</label>
+                    <input id="username" name="username" type="text" value="$(username)" placeholder="QR-XXXXXX" autocomplete="username" autocapitalize="characters" spellcheck="false" required />
+                </div>
+
+                <div class="field">
+                    <label for="password">Contraseña</label>
+                    <input id="password" name="password" type="password" placeholder="Contraseña del ticket" autocomplete="current-password" required />
+                </div>
+
+                <button class="btn" type="submit">Conectar</button>
+            </form>
+
+            <div class="card-footer">
+                <p>Escanea el QR WiFi primero y luego el QR de acceso</p>
+                <small>Powered by MikroTik RouterOS</small>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

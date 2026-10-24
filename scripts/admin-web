@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PYTHON="$BASE_DIR/.venv/bin/python"
+APP="$BASE_DIR/web/app.py"
+
+if [ ! -f "$PYTHON" ]; then
+  echo "No se encontró .venv/bin/python. Crea el entorno virtual:" >&2
+  echo "  python3 -m venv .venv && .venv/bin/pip install -r requirements.txt" >&2
+  exit 1
+fi
+
+if [ ! -f "$APP" ]; then
+  echo "No se encontró $APP" >&2
+  exit 1
+fi
+
+export PYTHONPATH="$BASE_DIR/scripts${PYTHONPATH:+:$PYTHONPATH}"
+exec "$PYTHON" "$APP" "$@"

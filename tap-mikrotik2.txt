@@ -1,0 +1,2 @@
+sudo ip tuntap add dev tap-mikrotik2 mode tap user armintec
+sudo ip link set tap-mikrotik2 up

@@ -38,6 +38,8 @@
 | **02** | [`02-COMANDOS-ESENCIALES-MIKROTIK.md`](./02-COMANDOS-ESENCIALES-MIKROTIK.md) | Las 12 reglas de oro de la sintaxis, los 8 comandos del 90%, bloques de comandos imprescindibles por área, safe mode, comandos peligrosos, los 12 `print` de diagnóstico, backup/export/restore, cheat sheet de una página. | Como referencia rápida. Lo que debes **saber de memoria**. |
 | **03** | [`03-EQUIVALENTES-VMWARE-VIRTUALBOX.md`](./03-EQUIVALENTES-VMWARE-VIRTUALBOX.md) | Tabla de equivalencias QEMU ↔ VMware ↔ VirtualBox, imágenes CHR oficiales, import del OVA, configuración de red (NAT / host-only / bridged), reenvío de puertos, conversión de imagen con `qemu-img`, reconexión del AP, rendimiento. | Si quieres el CHR en VMware o VirtualBox en lugar de QEMU. |
 | **04** | [`04-MIKROTIK-FISICO.md`](./04-MIKROTIK-FISICO.md) | CHR vs hardware, elección de equipo, primer arranque, actualización de RouterOS, bridge y offload por hardware, **`/interface wifi` vs `/interface wireless`**, hotspot sobre la radio real, CAPsMAN, WAN (PPPoE / DHCP / Starlink), licencias, migración de la config del CHR al hardware, hardening, netinstall y reset. | Si vas a montar esto en un RouterBOARD real. |
+| **05** | [`05-INFORME-VERIFICACION-HOTSPOT.md`](./05-INFORME-VERIFICACION-HOTSPOT.md) | Informe de la verificación punta a punta del hotspot: hostapd, bridge, DHCP, portal, login HTTP-CHAP, NAT. | Para ver qué se probó y cómo. |
+| **06** | [`06-TICKETS-QR.md`](./06-TICKETS-QR.md) | **Tickets QR**: script Python que usa la API de RouterOS, crea usuarios hotspot, genera QR WiFi + QR de login HTTP-PAP, tarjetas PNG, CSV/HTML y comandos de administración. | Cuando quieras repartir accesos sin escribir credenciales. |
 
 ---
 
@@ -53,8 +55,10 @@
 
 | Script | Para qué |
 |---|---|
-| [`../scripts/iniciar-lab.sh`](../scripts/iniciar-lab.sh) | Levanta todo el laboratorio: bridge `br-mikrotik`, tap `tap-mikrotik`, `hostapd` y el CHR en QEMU con el reenvío de puertos. |
+| [`../scripts/iniciar-lab.sh`](../scripts/iniciar-lab.sh) | Levanta todo el laboratorio: bridge `br-mikrotik`, tap `tap-mikrotik`, `hostapd` y el CHR en QEMU con el reenvío de puertos (SSH 2222, WinBox 8291, API 8728). |
 | [`../scripts/parar-lab.sh`](../scripts/parar-lab.sh) | Lo para todo y deja el host limpio. |
+| [`../scripts/ticket-qr`](../scripts/ticket-qr) | Lanzador del generador de tickets QR. |
+| [`../scripts/ticket_qr.py`](../scripts/ticket_qr.py) | Script Python: API RouterOS, usuarios hotspot, QR WiFi/login, tarjetas PNG, CSV/HTML. |
 
 ```bash
 # Uso
@@ -76,7 +80,7 @@
 | **LAN del hotspot** | `ether2` — 192.168.77.254/24 |
 | **Pool DHCP** | 192.168.77.100–192.168.77.199 |
 | **Portal** | `http://192.168.77.254/login` |
-| **Acceso al CHR** | `ssh -p 2222 admin@127.0.0.1` · WinBox `127.0.0.1:8291` |
+| **Acceso al CHR** | `ssh -p 2222 admin@127.0.0.1` · WinBox `127.0.0.1:8291` · API `127.0.0.1:8728` |
 
 ---
 
