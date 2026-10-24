@@ -41,6 +41,7 @@
 | **05** | [`05-INFORME-VERIFICACION-HOTSPOT.md`](./05-INFORME-VERIFICACION-HOTSPOT.md) | Informe de la verificación punta a punta del hotspot: hostapd, bridge, DHCP, portal, login HTTP-CHAP, NAT. | Para ver qué se probó y cómo. |
 | **06** | [`06-TICKETS-QR.md`](./06-TICKETS-QR.md) | **Tickets QR**: script Python que usa la API de RouterOS, crea usuarios hotspot, genera QR WiFi + QR de login HTTP-PAP, tarjetas PNG, CSV/HTML y comandos de administración. | Cuando quieras repartir accesos sin escribir credenciales. |
 | **07** | [`07-ARRANQUE-AUTOMATICO-Y-WEB.md`](./07-ARRANQUE-AUTOMATICO-Y-WEB.md) | **Arranque automático y panel web**: un solo comando para levantar red + AP + CHR + API + Flask, autostart al iniciar sesión, configuración del panel, exposición a la LAN y solución de problemas. | Para el día a día y para no olvidar el orden de arranque. |
+| **08** | [`08-CAMBIAR-CONTRASENA-AP.md`](./08-CAMBIAR-CONTRASENA-AP.md) | **Cambiar la clave del AP**: dejar `MIKROTIK-LAB` sin contraseña (`wpa=0`), poner otra clave WPA2, actualizar los QR WiFi (`T:nopass`) y revertir. | Cuando quieras abrir la red o rotar la clave. |
 
 ---
 
