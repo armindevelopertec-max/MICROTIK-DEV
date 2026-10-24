@@ -42,6 +42,7 @@
 | **06** | [`06-TICKETS-QR.md`](./06-TICKETS-QR.md) | **Tickets QR**: script Python que usa la API de RouterOS, crea usuarios hotspot, genera QR WiFi + QR de login HTTP-PAP, tarjetas PNG, CSV/HTML y comandos de administración. | Cuando quieras repartir accesos sin escribir credenciales. |
 | **07** | [`07-ARRANQUE-AUTOMATICO-Y-WEB.md`](./07-ARRANQUE-AUTOMATICO-Y-WEB.md) | **Arranque automático y panel web**: un solo comando para levantar red + AP + CHR + API + Flask, autostart al iniciar sesión, configuración del panel, exposición a la LAN y solución de problemas. | Para el día a día y para no olvidar el orden de arranque. |
 | **08** | [`08-CAMBIAR-CONTRASENA-AP.md`](./08-CAMBIAR-CONTRASENA-AP.md) | **Cambiar la clave del AP**: dejar `MIKROTIK-LAB` sin contraseña (`wpa=0`), poner otra clave WPA2, actualizar los QR WiFi (`T:nopass`) y revertir. | Cuando quieras abrir la red o rotar la clave. |
+| **09** | [`09-RECONSTRUIR-DESDE-CERO.md`](./09-RECONSTRUIR-DESDE-CERO.md) | **Reconstruir el CHR tras un reset**: recuperar acceso por consola, aplicar `mikrotik-lab-desde-cero.rsc`, verificar por capas, reconectar panel/tickets y limpieza para re-ejecutar. | Después de `/system reset-configuration` o para montar el CHR de cero. |
 
 ---
 
@@ -65,6 +66,7 @@
 | [`../scripts/admin-web`](../scripts/admin-web) | Lanzador del panel web Flask (`web/app.py`). |
 | [`../scripts/ticket-qr`](../scripts/ticket-qr) | Lanzador del generador de tickets QR. |
 | [`../scripts/ticket_qr.py`](../scripts/ticket_qr.py) | Script Python: API RouterOS, usuarios hotspot, QR WiFi/login, tarjetas PNG, CSV/HTML. |
+| [`../mikrotik-lab-desde-cero.rsc`](../mikrotik-lab-desde-cero.rsc) | **Configuración completa del CHR** en un solo archivo (WAN, LAN, DHCP, NAT, hotspot, firewall, API). Se importa con `/import`. |
 
 ```bash
 # Uso
